@@ -67,8 +67,6 @@ class Fullcalendar extends HTMLElement {
 
         const calendarElement = this.querySelector('.calendar');
 
-        const data = await this.getData();
-
         let calendarViewOptions;
         let initialView;
 
@@ -92,7 +90,10 @@ class Fullcalendar extends HTMLElement {
             initialView,
             editable: true,
             eventResizableFromStart: true,
-            events: data,
+            events: async () => {
+                let data = await this.getData();
+                return data;
+            },
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -133,6 +134,7 @@ class Fullcalendar extends HTMLElement {
 
         setTimeout(() => {
             this.calendar.render();
+            this.subscribeToPipeService();
         }, 0);
 
     }
@@ -175,6 +177,15 @@ class Fullcalendar extends HTMLElement {
         const response = await gudhub.jsonConstructor(schema);
 
         return response.items;
+    }
+
+    /* SUBSCRIBE TO PIPE SERVICE */
+    // Here we subscribe for update items event in pipe service to update calendar info dynamically
+
+    subscribeToPipeService() {
+        gudhub.on("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, () => {
+            this.calendar.refetchEvents();
+        })
     }
 
     /********************* GENERATE SCHEMA *********************/
