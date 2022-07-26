@@ -2,6 +2,7 @@ import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
 
 import { schemaGenerator } from './schemaGenerator.js';
 
@@ -67,7 +68,7 @@ class Fullcalendar extends HTMLElement {
         const data = await this.getData();
 
         this.calendar = new Calendar(calendarElement, {
-            plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
+            plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
             initialView: this.fieldModel.data_model.initialView ? this.fieldModel.data_model.initialView : 'dayGridMonth',
             editable: true,
             allDay: true,
@@ -76,7 +77,7 @@ class Fullcalendar extends HTMLElement {
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
             },
             eventDrop: async (info) => {
                 await this.changeDate(info);

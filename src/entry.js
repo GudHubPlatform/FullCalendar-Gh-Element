@@ -118,6 +118,10 @@ export default class FullcalendarData {
                                             {
                                                 name: 'Day',
                                                 value: 'timeGridDay'
+                                            },
+                                            {
+                                                name: 'List',
+                                                value: 'listMonth'
                                             }
                                         ]
                                     },
