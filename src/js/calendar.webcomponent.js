@@ -72,15 +72,15 @@ class Fullcalendar extends HTMLElement {
 
         switch(this.calendarType) {
             case 'dayGrid':
-                calendarViewOptions = 'dayGridDay,dayGridWeek,dayGridMonth';
+                calendarViewOptions = 'dayGridMonth,dayGridWeek,dayGridDay';
                 initialView = this.fieldModel.data_model.initialView ? this.calendarType + this.fieldModel.data_model.initialView : 'dayGridMonth';
                 break;
             case 'timeGrid':
-                calendarViewOptions = 'timeGridDay,timeGridWeek';
+                calendarViewOptions = 'timeGridWeek,timeGridDay';
                 initialView = this.fieldModel.data_model.initialView && this.fieldModel.data_model.initialView !== 'Month' ? this.calendarType + this.fieldModel.data_model.initialView : 'timeGridWeek';
                 break;
             case 'list':
-                calendarViewOptions = 'listDay,listWeek,listMonth,listYear';
+                calendarViewOptions = 'listYear,listMonth,listWeek,listDay';
                 initialView = this.fieldModel.data_model.initialView ? this.calendarType + this.fieldModel.data_model.initialView : 'listMonth';
                 break;
         }
