@@ -5,19 +5,28 @@ import './js/calendar.webcomponent.js';
 export default class FullcalendarData {
     getTemplate() {
         return {
-            constructor: 'field',
-            name: 'Fullcalendar',
+            constructor: 'action',
+            name: 'Calendar',
             icon: 'calendar',
-            type: 'fullcalendar',
+            type: 'calendar',
             model: {
-                'field_id': 0,
-                'field_name': 'Fullcalendar',
-                'field_value': '',
-                'data_id': 0,
-                'data_type': 'fullcalendar',
-                'file_name': '',
+                field_id: 0,
+                field_name: 'Calendar',
+                data_type: 'calendar',
                 data_model: {
-                    images_field_id: '',
+                    use_duration: false,
+                    view_id: "",
+                    table_settings: {
+                        action: ""
+                    },
+                    source_app_id: "",
+                    itemsStyles: [],
+                    itemsConfig: {
+                        displayFieldId: "",
+                        startFieldId: "",
+                        endDateFieldId: "",
+                        durationFieldId: ""
+                    },
                     interpretation: [{
                         src: 'form',
                         id: 'default',

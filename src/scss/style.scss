@@ -5,3 +5,7 @@ full-calendar {
 .fullcalendar {
     width: 100%;
 }
+
+a.fc-daygrid-dot-event:hover {
+    padding: 2px;
+}

@@ -9,7 +9,6 @@ import { schemaGenerator } from './schemaGenerator.js';
 import './../scss/style.scss';
 
 import '@fullcalendar/common/main.min.css';
-import '@fullcalendar/daygrid/main.min.css';
 
 /********************* FULLCALENDAR WEB COMPONENT CREATING *********************/
 
