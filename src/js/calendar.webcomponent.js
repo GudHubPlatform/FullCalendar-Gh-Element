@@ -21,6 +21,7 @@ class Fullcalendar extends HTMLElement {
         this.fieldId;
         this.fieldModel;
         this.isDurationMode;
+        this.calendarType;
     }
 
     /********************* OBSERVED ATTRIBUTES *********************/
@@ -36,6 +37,7 @@ class Fullcalendar extends HTMLElement {
     async getAttributes() {
         this.appId = this.getAttribute('app-id');
         this.fieldId = this.getAttribute('field-id');
+        this.calendarType = this.getAttribute('calendar-type');
 
         this.fieldModel = await gudhub.getField(this.appId, this.fieldId);
         this.isDurationMode = this.fieldModel.data_model.use_duration && this.fieldModel.data_model.use_duration === 1 ? true : false;
@@ -67,17 +69,45 @@ class Fullcalendar extends HTMLElement {
 
         const data = await this.getData();
 
+        let calendarViewOptions;
+        let initialView;
+
+        switch(this.calendarType) {
+            case 'dayGrid':
+                calendarViewOptions = 'dayGridDay,dayGridWeek,dayGridMonth';
+                initialView = this.fieldModel.data_model.initialView ? this.calendarType + this.fieldModel.data_model.initialView : 'dayGridMonth';
+                break;
+            case 'timeGrid':
+                calendarViewOptions = 'timeGridDay,timeGridWeek';
+                initialView = this.fieldModel.data_model.initialView && this.fieldModel.data_model.initialView !== 'Month' ? this.calendarType + this.fieldModel.data_model.initialView : 'timeGridWeek';
+                break;
+            case 'list':
+                calendarViewOptions = 'listDay,listWeek,listMonth,listYear';
+                initialView = this.fieldModel.data_model.initialView ? this.calendarType + this.fieldModel.data_model.initialView : 'listMonth';
+                break;
+        }
+
         this.calendar = new Calendar(calendarElement, {
             plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
-            initialView: this.fieldModel.data_model.initialView ? this.fieldModel.data_model.initialView : 'dayGridMonth',
+            initialView,
             editable: true,
-            allDay: true,
             eventResizableFromStart: true,
             events: data,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                right: calendarViewOptions
+            },
+            views: {
+                listDay: { buttonText: 'Day' },
+                listWeek: { buttonText: 'Week' },
+                listMonth: { buttonText: 'Month' },
+                listYear: { buttonText: 'Year' },
+                dayGridDay: {buttonText: 'Day'},
+                dayGridWeek: {buttonText: 'Week'},
+                dayGridMonth: {buttonText: 'Month'},
+                timeGridDay: {buttonText: 'Day'},
+                timeGridWeek: {buttonText: 'Week'},
             },
             eventDrop: async (info) => {
                 await this.changeDate(info);
@@ -91,18 +121,19 @@ class Fullcalendar extends HTMLElement {
             },
             eventClick: (info) => {
                 if(this.fieldModel.data_model.table_settings.action === 'open_item') {
-                    window.location.pathname = `/act/open_item/${info.event.id.split('.')[0]}/${this.fieldModel.data_model.view_id}/${info.event.id.split('.')[1]}`
+                    let angularElement = angular.element(this.parentElement);
+                    let scope = angularElement.scope();
+                    let injector = angularElement.injector();
+                    let location = injector.get('$location');
+                    location.path(`/act/open_item/${info.event.id.split('.')[0]}/${this.fieldModel.data_model.view_id}/${info.event.id.split('.')[1]}`);
+                    scope.$apply();
                 }
             }
         });
 
-        /* TODO: */
-        // Need to find a way to fix this awful timeout
-        // Without timeout calendar renders super small
-
         setTimeout(() => {
             this.calendar.render();
-        }, 500);
+        }, 0);
 
     }
 

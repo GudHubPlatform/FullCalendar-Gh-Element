@@ -47,9 +47,27 @@ export default class FullcalendarData {
         return [
             {
                 id: 'default',
-                name: 'Default',
+                name: 'Classic',
                 content: () =>
-                    '<full-calendar app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+                    '<full-calendar calendar-type="dayGrid" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+            },
+            {
+                id: 'time',
+                name: 'Time',
+                content: () =>
+                    '<full-calendar calendar-type="timeGrid" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+            },
+            {
+                id: 'list',
+                name: 'List',
+                content: () =>
+                    '<full-calendar calendar-type="list" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+            },
+            {
+                id: 'icon',
+                name: 'Icon',
+                content: () =>
+                    '<span gh-icon="date 0fb5ff 45px none"></span>'
             }
         ];
     }
@@ -108,20 +126,16 @@ export default class FullcalendarData {
                                     data_model: {
                                         options: [
                                             {
-                                                name: 'Month',
-                                                value: 'dayGridMonth'
+                                                name: 'Day',
+                                                value: 'Day'
                                             },
                                             {
                                                 name: 'Week',
-                                                value: 'timeGridWeek'
+                                                value: 'Week'
                                             },
                                             {
-                                                name: 'Day',
-                                                value: 'timeGridDay'
-                                            },
-                                            {
-                                                name: 'List',
-                                                value: 'listMonth'
+                                                name: 'Month',
+                                                value: 'Month'
                                             }
                                         ]
                                     },
