@@ -4,18 +4,30 @@
 export function schemaGenerator(options) {
 
     function startFunction(item, app, startFieldId) {
-        let start = item.fields.find(field => field.field_id == startFieldId).field_value;
-        return new Date(+start);
+        let startField = item.fields.find(field => field.field_id == startFieldId);
+        if(startField) {
+            return new Date(+startField.field_value);
+        } else {
+            return null;
+        }
     }
 
     function endFunction(item, app, isDurationMode, startFieldId, endFieldId, durationFieldId) {
         if(isDurationMode) {
-            let duration = item.fields.find(field => field.field_id == durationFieldId).field_value;
-            let start = item.fields.find(field => field.field_id == startFieldId).field_value;
-            return new Date(+start + +duration);
+            let durationField = item.fields.find(field => field.field_id == durationFieldId);
+            let startField = item.fields.find(field => field.field_id == startFieldId);
+            if(durationField && startField) {
+                return new Date(+startField.field_value + +durationField.field_value);
+            } else {
+                return null;
+            }
         } else {
-            let end = item.fields.find(field => field.field_id == endFieldId).field_value;
-            return new Date(+end);
+            let endField = item.fields.find(field => field.field_id == endFieldId);
+            if(endField) {
+                return new Date(+endField.field_value);
+            } else {
+                return null;
+            }
         }
     }
 

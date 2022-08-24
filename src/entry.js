@@ -51,7 +51,7 @@ export default class FullcalendarData {
 
     /*------------------------------- ACTION INTERPRETATION --------------------------------------*/
 
-    getInterpretation(value, appId, itemId, field_model) {
+    getInterpretation(gudhub, value, appId, itemId, field_model) {
 
         return [
             {
