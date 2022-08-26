@@ -70,6 +70,23 @@ class Fullcalendar extends HTMLElement {
         let initialView;
 
         switch(this.calendarType) {
+            case 'default':
+                calendarViewOptions = 'dayGridMonth,timeGridWeek,timeGridDay,listDay';
+                switch(this.fieldModel.data_model.initialView) {
+                    case 'Month':
+                        initialView = 'dayGridMonth';
+                        break;
+                    case 'Week':
+                        initialView = 'timeGridWeek';
+                        break;
+                    case 'Day':
+                        initialView = 'timeGridDay';
+                        break;
+                    default:
+                        initialView = 'dayGridMonth';
+                        break;
+                }
+                break;
             case 'dayGrid':
                 calendarViewOptions = 'dayGridMonth,dayGridWeek,dayGridDay';
                 initialView = this.fieldModel.data_model.initialView ? this.calendarType + this.fieldModel.data_model.initialView : 'dayGridMonth';
@@ -89,6 +106,7 @@ class Fullcalendar extends HTMLElement {
             initialView,
             editable: true,
             eventResizableFromStart: true,
+            eventDisplay: 'block',
             events: [],
             headerToolbar: {
                 left: 'prev,next today',
@@ -97,8 +115,8 @@ class Fullcalendar extends HTMLElement {
             },
             dayMaxEvents: true,
             views: {
-                listDay: { buttonText: 'Day' },
-                listWeek: { buttonText: 'Week' },
+                listDay: { buttonText: 'List day' },
+                listWeek: { buttonText: 'List week' },
                 listMonth: { buttonText: 'Month' },
                 listYear: { buttonText: 'Year' },
                 dayGridDay: {buttonText: 'Day'},

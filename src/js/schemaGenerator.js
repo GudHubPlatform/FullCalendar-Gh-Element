@@ -39,7 +39,7 @@ export function schemaGenerator(options) {
         stylesFieldModel.data_model.itemsStyles.forEach(style => {
             let filtered = gudhub.filter([item], style.filters_list);
             if(filtered.length > 0) {
-                textColor = style.textColor;
+                textColor = style.color;
             }
         });
         return textColor;
@@ -53,7 +53,7 @@ export function schemaGenerator(options) {
         stylesFieldModel.data_model.itemsStyles.forEach(style => {
             let filtered = gudhub.filter([item], style.filters_list);
             if(filtered.length > 0) {
-                backgroundColor = style.backgroundColor;
+                backgroundColor = style['background-color'];
             }
         });
         return backgroundColor;

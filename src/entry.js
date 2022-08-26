@@ -56,6 +56,12 @@ export default class FullcalendarData {
         return [
             {
                 id: 'default',
+                name: 'Default',
+                content: () =>
+                    '<full-calendar calendar-type="default" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+            },
+            {
+                id: 'classic',
                 name: 'Classic',
                 content: () =>
                     '<full-calendar calendar-type="dayGrid" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
@@ -80,16 +86,6 @@ export default class FullcalendarData {
             }
         ];
     }
-
-    /*------------------------------- WINDOW HTML TEMPLATE --------------------------------------*/
-    getWindowHTML(scope) {
-        return new Promise(resolve => {
-            resolve();
-        })
-    }
-
-    /*------------------------------- ACTION SCOPE --------------------------------------*/
-    getActionScope(scope) { }
 
     /*--------------------------  ACTION SETTINGS --------------------------------*/
     getSettings(scope) {
@@ -295,50 +291,45 @@ export default class FullcalendarData {
                         }
                     ], [
                         {
-                            title: 'Items Styles Settings',
-                            type: 'header'
-                        }, {
-                            type: 'html',
-                            data_model: function (fieldModel) {
-                                return {
-                                    patterns: [{
-                                        property: 'textColor',
-                                        prop_name: 'Text color',
-                                        type: 'color',
-                                        display: true,
-                                        data_model: function (option) { }
-                                    }, {
-                                        property: 'backgroundColor',
-                                        prop_name: 'Background color',
-                                        type: 'color',
-                                        display: true,
-                                        data_model: function (option) { }
-                                    }, {
-                                        property: 'filters_list',
-                                        prop_name: 'Conditions',
-                                        type: 'filter_table',
-                                        display: true,
-                                        data_model: function (option, scope) {
-                                            scope.appId = fieldModel.data_model.source_app_id;
-
-                                            option.filters_list ? scope.filters_list = option.filters_list : scope.filters_list = option.filters_list = [];
-
-                                        },
-                                    }
-                                    ]
-                                };
-                            },
-                            control:
-                                '<gh-option-table items="fieldModel.data_model.itemsStyles" pattern="field_model.patterns"></gh-option-table>'
+                          title: 'Items Styles Settings',
+                          type: 'header'
+                        },{
+                          type: 'html',
+                          data_model: function (fieldModel) {
+                            return {
+                              patterns: [{
+                                property: 'color',
+                                prop_name: 'Text color',
+                                type: 'color',
+                                display: true,
+                                data_model:function(option){}
+                              }, {
+                                property: 'background-color',
+                                prop_name: 'Background color',
+                                type: 'color',
+                                display: true,
+                                data_model:function(option){}
+                              }, {
+                                  property: 'filters_list',
+                                  prop_name: 'Conditions',
+                                  type: 'filter_table',
+                                  display: true,
+                                  data_model:function(option, scope) {
+                                    scope.appId = fieldModel.data_model.source_app_id;
+            
+                                    option.filters_list ? scope.filters_list = option.filters_list : scope.filters_list = option.filters_list = [];
+            
+                                  },
+                                }
+                              ]
+                            };
+                          },
+                          control:
+                            '<gh-option-table items="fieldModel.data_model.itemsStyles" pattern="field_model.patterns"></gh-option-table>'
                         }
-                    ]
+                      ]
                 ]
             }
         ];
-    }
-
-    /*----------------------------- RUN ACTION -------------------------*/
-    runAction(scope) {
-        return '';
     }
 }
