@@ -75,7 +75,8 @@ export function schemaGenerator(options) {
                 id: 3,
                 property_name: "title",
                 property_type: "field_value",
-                field_id: options.titleFieldId
+                field_id: options.titleFieldId,
+                interpretation: 1
             },
             {
                 type: "property",
