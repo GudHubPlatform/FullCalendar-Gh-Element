@@ -29,6 +29,7 @@ a.fc-daygrid-dot-event:hover {
         align-items: center;
         justify-content: center;
         z-index: 100;
+        min-height: 200px;
 
         &.active {
             display: flex;

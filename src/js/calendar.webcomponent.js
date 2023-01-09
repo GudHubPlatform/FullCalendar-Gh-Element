@@ -205,13 +205,26 @@ class Fullcalendar extends HTMLElement {
 
     subscribeToPipeService() {
         // Need to fix error on items changing on subscribe
-        gudhub.on("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, async () => {
-            let updatedData = await this.getData();
-            this.calendar.getEventSources().forEach(source => {
-                source.remove();
-            });
-            this.calendar.addEventSource(updatedData);
-        })
+        gudhub.on("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.getCalendarEvents);
+    }
+
+    /* FETCH CALENDAR EVENTS */
+    // Fetching data for calendar, preparing it, and passing to calendar
+
+    async getCalendarEvents() {
+        let updatedData = await this.getData();
+        this.calendar.getEventSources().forEach(source => {
+            source.remove();
+        });
+        this.calendar.addEventSource(updatedData);
+    }
+
+    /* UNSUBSCRIBE FROM PIPE SERVICE */
+    // Unsubscribing from PipeService
+    // Call at disconnectedCallback to increase performance
+
+    unsubscribeFromPipe() {
+        gudhub.destroy("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.getCalendarEvents);
     }
 
     /********************* GENERATE SCHEMA *********************/
@@ -235,6 +248,14 @@ class Fullcalendar extends HTMLElement {
         }
 
         return schemaGenerator(schemaOptions)
+    }
+
+    /* DISCONNECTED CALLBACK */
+    // Call unsubscribe from PipeService method
+
+    disconnectedCallback() {
+        this.unsubscribeFromPipe();
+        this.calendar.destroy();
     }
 }
 
