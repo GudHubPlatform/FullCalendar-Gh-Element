@@ -144,6 +144,12 @@ class Fullcalendar extends HTMLElement {
                     location.path(`/act/open_item/${info.event.id.split('.')[0]}/${this.fieldModel.data_model.view_id}/${info.event.id.split('.')[1]}`);
                     scope.$apply();
                 }
+            },
+            datesSet: async (dateInfo) => {
+                if(this.calendar.getEventSourceById(`${dateInfo.start.getUTCMonth() + 2}-${dateInfo.start.getUTCFullYear()}`) == null) {
+                    const data = await this.getData(dateInfo.start.getUTCMonth() + 2, dateInfo.start.getUTCFullYear());
+                    this.calendar.addEventSource(data);
+                }
             }
         });
 
@@ -152,7 +158,7 @@ class Fullcalendar extends HTMLElement {
             this.subscribeToPipeService();
         }, 0);
 
-        let data = await this.getData();
+        let data = await this.getData(new Date().getUTCMonth() + 1, new Date().getUTCFullYear());
         
         this.calendar.addEventSource(data);
 
@@ -192,12 +198,15 @@ class Fullcalendar extends HTMLElement {
     /********************* GET DATA *********************/
     // Getting events data from.
 
-    async getData() {
-        const schema = this.generateSchema();
+    async getData(month, year) {
+        const schema = this.generateSchema(month, year);
 
         const response = await gudhub.jsonConstructor(schema);
 
-        return response.items;
+        return {
+            id: `${month}-${year}`,
+            events: response.items
+        }
     }
 
     /* SUBSCRIBE TO PIPE SERVICE */
@@ -231,14 +240,16 @@ class Fullcalendar extends HTMLElement {
     // Here we call the data schema generator with right options.
     // We need this schema to get data in right format for fullcalendar.
 
-    generateSchema() {
+    generateSchema(month, year) {
         const schemaOptions = {
             sourceAppId: this.fieldModel.data_model.source_app_id,
             titleFieldId: this.fieldModel.data_model.itemsConfig.displayFieldId,
             startFieldId: this.fieldModel.data_model.itemsConfig.startFieldId,
             isDurationMode: this.fieldModel.data_model.use_duration && this.fieldModel.data_model.use_duration === 1 ? true : false,
             stylesAppId: this.fieldModel.data_model.itemsStyles ? this.fieldModel.app_id : false,
-            stylesFieldId: this.fieldModel.data_model.itemsStyles ? this.fieldModel.field_id : false
+            stylesFieldId: this.fieldModel.data_model.itemsStyles ? this.fieldModel.field_id : false,
+            month,
+            year
         }
 
         if (schemaOptions.isDurationMode === true) {

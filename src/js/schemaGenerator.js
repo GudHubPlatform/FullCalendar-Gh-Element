@@ -59,6 +59,12 @@ export function schemaGenerator(options) {
         return backgroundColor;
     }
 
+    const startMonth = Number(options.month) < 10 ? `0${options.month}` : `${options.month}`;
+    const endMonth = Number(options.month) < 9 ? `0${options.month + 1}` : Number(options.month) !== 12 ? `${options.month + 1}` : '01';
+
+    const startFilterDate = new Date(`${options.year}-${startMonth}-01`).getTime();
+    const endFilterDate = new Date(`${Number(options.month) != 12 ? options.year : options.year + 1}-${endMonth}-01`).getTime() - 1;
+
     return {
         type: "array",
         id: 1,
@@ -113,6 +119,14 @@ export function schemaGenerator(options) {
         ],
         property_name: "items",
         app_id: options.sourceAppId,
-        filter: []
+        filter: [
+            {
+                field_id: options.startFieldId,
+                data_type: "date",
+                valuesArray: `${startFilterDate}:${endFilterDate}`,
+                search_type: "range",
+                selected_search_option_variable: "Value"
+            }
+        ]
     }
 }
