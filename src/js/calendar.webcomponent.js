@@ -221,7 +221,8 @@ class Fullcalendar extends HTMLElement {
     // Fetching data for calendar, preparing it, and passing to calendar
 
     async getCalendarEvents() {
-        let updatedData = await this.getData();
+        const pickedDate = this.calendar.getDate();
+        let updatedData = await this.getData(pickedDate.getUTCMonth() + 1, pickedDate.getUTCFullYear());
         this.calendar.getEventSources().forEach(source => {
             source.remove();
         });
