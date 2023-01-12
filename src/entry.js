@@ -19,6 +19,7 @@ export default class FullcalendarData {
                     table_settings: {
                         action: ""
                     },
+                    filters_list: [],
                     source_app_id: "",
                     itemsStyles: [],
                     itemsConfig: {
@@ -288,7 +289,32 @@ export default class FullcalendarData {
                                     data_type: 'view_list'
                                 };
                             }
-                        }
+                        },
+                        {
+                            title: 'Table Filter',
+                            type: 'header'
+                          },{
+                            type: 'html',
+            
+                            onInit: function (settingScope) {
+            
+                              scope.$watch(function () {
+                                return scope.fieldModel.data_model.source_app_id;
+                              }, function(newValue) {
+                                settingScope.field_model.recipient.source_app_id = newValue;
+                              });
+            
+                            },
+                            data_model: function (fieldModel) {
+                              return {
+                                recipient:{
+                                  app_id: fieldModel.data_model.source_app_id
+                                }
+                              };
+                            },
+                            control:
+                              '<gh-filter gh-filter-data-model="field_model" filter-list="fieldModel.data_model.filters_list" gh-mode="variable"></gh-filter>'
+                          }
                     ], [
                         {
                           title: 'Items Styles Settings',
