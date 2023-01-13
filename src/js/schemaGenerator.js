@@ -127,7 +127,7 @@ export function schemaGenerator(options) {
                 search_type: "range",
                 selected_search_option_variable: "Value"
             },
-            // ...options.filters
+            ...options.filters
         ]
     }
 }

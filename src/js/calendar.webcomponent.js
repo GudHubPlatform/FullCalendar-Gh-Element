@@ -21,6 +21,7 @@ class Fullcalendar extends HTMLElement {
         this.fieldModel;
         this.isDurationMode;
         this.calendarType;
+        this.filtersFromEvent = [];
     }
 
     /********************* OBSERVED ATTRIBUTES *********************/
@@ -198,10 +199,10 @@ class Fullcalendar extends HTMLElement {
     /********************* GET DATA *********************/
     // Getting events data from.
 
-    async getData(month, year, eventFilters) {
+    async getData(month, year) {
         let filters = this.fieldModel.data_model.filters_list;
-        if(eventFilters) {
-            filters = [...filters, ...eventFilters];
+        if(this.filtersFromEvent) {
+            filters = [...filters, ...this.filtersFromEvent];
         }
         const schema = this.generateSchema(month, year, filters);
         const response = await gudhub.jsonConstructor(schema);
@@ -217,22 +218,18 @@ class Fullcalendar extends HTMLElement {
 
     subscribeToPipeService() {
         // Need to fix error on items changing on subscribe
-        gudhub.on("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.getCalendarEvents);
-        gudhub.on('filter', { app_id: this.fieldModel.app_id, field_id: this.fieldModel.field_id }, this.handleFilterEvent)
-    }
 
-    /* HANDLE FILTER EVENT */
-    // Fires when binded filter change
+        this.handleFilterEvent = (event, filters) => {
+            this.filtersFromEvent = filters || [];
+            this.getCalendarEvents();
+        }
 
-    async handleFilterEvent(event, filters) {
-        console.log('EVENT: ', event);
-        console.log('THIS: ', this);
-        const pickedDate = this.calendar.getDate();
-        const data = await this.getData(pickedDate.getUTCMonth() + 1, pickedDate.getUTCFullYear(), filters);
-        this.calendar.getEventSources().forEach(source => {
-            source.remove();
-        });
-        this.calendar.addEventSource(data);
+        this.handleItemsUpdate = () => {
+            this.getCalendarEvents();
+        }
+
+        gudhub.on("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.handleItemsUpdate);
+        gudhub.on('filter', { app_id: this.fieldModel.app_id, field_id: this.fieldModel.field_id }, this.handleFilterEvent);
     }
 
     /* FETCH CALENDAR EVENTS */
@@ -252,7 +249,7 @@ class Fullcalendar extends HTMLElement {
     // Call at disconnectedCallback to increase performance
 
     unsubscribeFromPipe() {
-        gudhub.destroy("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.getCalendarEvents);
+        gudhub.destroy("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.handleItemsUpdate);
     }
 
     /********************* GENERATE SCHEMA *********************/
