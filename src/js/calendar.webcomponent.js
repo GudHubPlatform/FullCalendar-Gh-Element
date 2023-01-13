@@ -21,6 +21,7 @@ class Fullcalendar extends HTMLElement {
         this.fieldModel;
         this.isDurationMode;
         this.calendarType;
+        this.filtersFromEvent = [];
     }
 
     /********************* OBSERVED ATTRIBUTES *********************/
@@ -199,8 +200,11 @@ class Fullcalendar extends HTMLElement {
     // Getting events data from.
 
     async getData(month, year) {
-        const schema = this.generateSchema(month, year);
-
+        let filters = this.fieldModel.data_model.filters_list;
+        if(this.filtersFromEvent) {
+            filters = [...filters, ...this.filtersFromEvent];
+        }
+        const schema = this.generateSchema(month, year, filters);
         const response = await gudhub.jsonConstructor(schema);
 
         return {
@@ -214,7 +218,18 @@ class Fullcalendar extends HTMLElement {
 
     subscribeToPipeService() {
         // Need to fix error on items changing on subscribe
-        gudhub.on("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.getCalendarEvents);
+
+        this.handleFilterEvent = (event, filters) => {
+            this.filtersFromEvent = filters || [];
+            this.getCalendarEvents();
+        }
+
+        this.handleItemsUpdate = () => {
+            this.getCalendarEvents();
+        }
+
+        gudhub.on("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.handleItemsUpdate);
+        gudhub.on('filter', { app_id: this.fieldModel.app_id, field_id: this.fieldModel.field_id }, this.handleFilterEvent);
     }
 
     /* FETCH CALENDAR EVENTS */
@@ -234,14 +249,14 @@ class Fullcalendar extends HTMLElement {
     // Call at disconnectedCallback to increase performance
 
     unsubscribeFromPipe() {
-        gudhub.destroy("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.getCalendarEvents);
+        gudhub.destroy("gh_items_update", { app_id: this.fieldModel.data_model.source_app_id }, this.handleItemsUpdate);
     }
 
     /********************* GENERATE SCHEMA *********************/
     // Here we call the data schema generator with right options.
     // We need this schema to get data in right format for fullcalendar.
 
-    generateSchema(month, year) {
+    generateSchema(month, year, filters) {
         const schemaOptions = {
             sourceAppId: this.fieldModel.data_model.source_app_id,
             titleFieldId: this.fieldModel.data_model.itemsConfig.displayFieldId,
@@ -250,7 +265,8 @@ class Fullcalendar extends HTMLElement {
             stylesAppId: this.fieldModel.data_model.itemsStyles ? this.fieldModel.app_id : false,
             stylesFieldId: this.fieldModel.data_model.itemsStyles ? this.fieldModel.field_id : false,
             month,
-            year
+            year,
+            filters
         }
 
         if (schemaOptions.isDurationMode === true) {

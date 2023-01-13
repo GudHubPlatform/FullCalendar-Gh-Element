@@ -126,7 +126,8 @@ export function schemaGenerator(options) {
                 valuesArray: `${startFilterDate}:${endFilterDate}`,
                 search_type: "range",
                 selected_search_option_variable: "Value"
-            }
+            },
+            ...options.filters
         ]
     }
 }
