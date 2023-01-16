@@ -200,7 +200,7 @@ class Fullcalendar extends HTMLElement {
     // Getting events data from.
 
     async getData(month, year) {
-        let filters = this.fieldModel.data_model.filters_list;
+        let filters = this.fieldModel.data_model.filters_list || [];
         if(this.filtersFromEvent) {
             filters = [...filters, ...this.filtersFromEvent];
         }
