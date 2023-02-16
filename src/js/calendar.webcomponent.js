@@ -22,6 +22,7 @@ class Fullcalendar extends HTMLElement {
         this.isDurationMode;
         this.calendarType;
         this.filtersFromEvent = [];
+        this.sizeUpdated = false;
     }
 
     /********************* OBSERVED ATTRIBUTES *********************/
@@ -149,7 +150,12 @@ class Fullcalendar extends HTMLElement {
             datesSet: async (dateInfo) => {
                 if(this.calendar.getEventSourceById(`${dateInfo.start.getUTCMonth() + 2}-${dateInfo.start.getUTCFullYear()}`) == null) {
                     const data = await this.getData(dateInfo.start.getUTCMonth() + 2, dateInfo.start.getUTCFullYear());
+                    if(!this.sizeUpdated) {
+                        this.calendar.updateSize();
+                        this.sizeUpdated = true;
+                    }
                     this.calendar.addEventSource(data);
+                    this.querySelector('.calendar__preloader').classList.remove('active');
                 }
             }
         });
@@ -158,8 +164,6 @@ class Fullcalendar extends HTMLElement {
             this.calendar.render();
             this.subscribeToPipeService();
         }, 0);
-
-        this.querySelector('.calendar__preloader').classList.remove('active');
 
     }
 
