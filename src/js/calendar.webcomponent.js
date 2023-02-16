@@ -159,10 +159,6 @@ class Fullcalendar extends HTMLElement {
             this.subscribeToPipeService();
         }, 0);
 
-        let data = await this.getData(new Date().getUTCMonth() + 1, new Date().getUTCFullYear());
-        
-        this.calendar.addEventSource(data);
-
         this.querySelector('.calendar__preloader').classList.remove('active');
 
     }
