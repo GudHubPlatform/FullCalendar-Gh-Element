@@ -3,7 +3,7 @@
 
 export function schemaGenerator(options) {
 
-    function startFunction(item, app, startFieldId) {
+    function startFunction(item, app, gudhub, startFieldId) {
         let startField = item.fields.find(field => field.field_id == startFieldId);
         if(startField) {
             return new Date(+startField.field_value);
@@ -12,7 +12,7 @@ export function schemaGenerator(options) {
         }
     }
 
-    function endFunction(item, app, isDurationMode, startFieldId, endFieldId, durationFieldId) {
+    function endFunction(item, app, gudhub, isDurationMode, startFieldId, endFieldId, durationFieldId) {
         if(isDurationMode) {
             let durationField = item.fields.find(field => field.field_id == durationFieldId);
             let startField = item.fields.find(field => field.field_id == startFieldId);
@@ -31,7 +31,7 @@ export function schemaGenerator(options) {
         }
     }
 
-    async function styleTextFunction (item, app, stylesAppId, stylesFieldId) {
+    async function styleTextFunction (item, app, gudhub, stylesAppId, stylesFieldId) {
         let stylesFieldModel = await gudhub.getField(stylesAppId, stylesFieldId);
 
         let textColor;
@@ -45,7 +45,7 @@ export function schemaGenerator(options) {
         return textColor;
     }
 
-    async function styleBackgroundFunction (item, app, stylesAppId, stylesFieldId) {
+    async function styleBackgroundFunction (item, app, gudhub, stylesAppId, stylesFieldId) {
         let stylesFieldModel = await gudhub.getField(stylesAppId, stylesFieldId);
 
         let backgroundColor;
