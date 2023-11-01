@@ -148,25 +148,8 @@ class Fullcalendar extends HTMLElement {
                 }
             },
             datesSet: async (dateInfo) => {
-                let eventSource = this.calendar.getEventSourceById(`${dateInfo.start.getMonth() + 1}-${dateInfo.start.getUTCFullYear()}`);
-                let dateChanged = false;
-                let lastDate;
-                
-                if(eventSource) {
-                    lastDate = eventSource;
-                    eventSource = this.calendar.getEventSourceById(`${eventSource.context.currentDate.getMonth() + 1}-${eventSource.context.currentDate.getUTCFullYear()}`);
-                    dateChanged = true;
-                }
-
-                if(!eventSource) {
-                    let data;
-                    
-                    data = await this.getData(dateInfo.start.getMonth() + 1, dateInfo.start.getFullYear());
-
-                    if(dateChanged) {
-                        data = await this.getData(lastDate.context.currentDate.getMonth() + 1, lastDate.context.currentDate.getFullYear());
-                    }
-                    
+                if(this.calendar.getEventSourceById(`${dateInfo.start.getUTCMonth() + 2}-${dateInfo.start.getUTCFullYear()}`) == null) {
+                    const data = await this.getData(dateInfo.start.getUTCMonth() + 2, dateInfo.start.getUTCFullYear());
                     if(!this.sizeUpdated) {
                         this.calendar.updateSize();
                         this.sizeUpdated = true;
@@ -254,7 +237,7 @@ class Fullcalendar extends HTMLElement {
 
     async getCalendarEvents() {
         const pickedDate = this.calendar.getDate();
-        let updatedData = await this.getData(pickedDate.getMonth() + 1, pickedDate.getUTCFullYear());
+        let updatedData = await this.getData(pickedDate.getUTCMonth() + 1, pickedDate.getUTCFullYear());
         this.calendar.getEventSources().forEach(source => {
             source.remove();
         });
