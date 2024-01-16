@@ -110,6 +110,7 @@ class Fullcalendar extends HTMLElement {
             eventResizableFromStart: true,
             eventDisplay: 'block',
             events: [],
+            showNonCurrentDates: false,
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
