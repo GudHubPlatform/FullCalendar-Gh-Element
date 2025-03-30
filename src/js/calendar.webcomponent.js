@@ -18,6 +18,7 @@ class Fullcalendar extends HTMLElement {
         this.calendar;
         this.appId;
         this.fieldId;
+        this.itemId;
         this.fieldModel;
         this.isDurationMode;
         this.calendarType;
@@ -38,6 +39,7 @@ class Fullcalendar extends HTMLElement {
     async getAttributes() {
         this.appId = this.getAttribute('app-id');
         this.fieldId = this.getAttribute('field-id');
+        this.itemId = this.getAttribute('item-id');
         this.calendarType = this.getAttribute('calendar-type');
 
         this.fieldModel = await gudhub.getField(this.appId, this.fieldId);
@@ -236,8 +238,10 @@ class Fullcalendar extends HTMLElement {
         if(this.filtersFromEvent) {
             filters = [...filters, ...this.filtersFromEvent];
         }
+        const item = await gudhub.getItem(this.appId, this.itemId);
+
         const schema = this.generateSchema(month, year, filters);
-        const response = await gudhub.jsonConstructor(schema);
+        const response = await gudhub.jsonConstructor(schema, item, [], this.appId);
 
         return {
             id: `${month}-${year}`,

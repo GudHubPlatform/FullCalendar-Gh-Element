@@ -64,25 +64,25 @@ export default class FullcalendarData {
                 id: 'default',
                 name: 'Default',
                 content: () =>
-                    '<full-calendar calendar-type="default" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+                    '<full-calendar calendar-type="default" app-id="{{ appId }}" field-id="{{ fieldId }}" item-id="{{ itemId }}"></full-calendar>'
             },
             {
                 id: 'classic',
                 name: 'Classic',
                 content: () =>
-                    '<full-calendar calendar-type="dayGrid" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+                    '<full-calendar calendar-type="dayGrid" app-id="{{ appId }}" field-id="{{ fieldId }}" item-id="{{ itemId }}"></full-calendar>'
             },
             {
                 id: 'time',
                 name: 'Time',
                 content: () =>
-                    '<full-calendar calendar-type="timeGrid" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+                    '<full-calendar calendar-type="timeGrid" app-id="{{ appId }}" field-id="{{ fieldId }}" item-id="{{ itemId }}"></full-calendar>'
             },
             {
                 id: 'list',
                 name: 'List',
                 content: () =>
-                    '<full-calendar calendar-type="list" app-id="{{ appId }}" field-id="{{ fieldId }}"></full-calendar>'
+                    '<full-calendar calendar-type="list" app-id="{{ appId }}" field-id="{{ fieldId }}" item-id="{{ itemId }}"></full-calendar>'
             },
             {
                 id: 'icon',
