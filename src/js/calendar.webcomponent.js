@@ -103,6 +103,18 @@ class Fullcalendar extends HTMLElement {
                 break;
         }
 
+        let slotMinTime = '00', slotMaxTime = '24';
+        const isCustomRange = this.fieldModel.data_model.use_custom_range && 
+            this.fieldModel.data_model.ranges.min &&
+            this.fieldModel.data_model.ranges.max &&
+            !(Number.isNaN(Number(this.fieldModel.data_model.ranges.min))) &&
+            !(Number.isNaN(Number(this.fieldModel.data_model.ranges.max)));
+
+        if(isCustomRange) {
+            slotMinTime = this.fieldModel.data_model.ranges.min;
+            slotMaxTime = this.fieldModel.data_model.ranges.max;
+        }
+
         this.calendar = new Calendar(calendarElement, {
             plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
             initialView,
@@ -128,6 +140,8 @@ class Fullcalendar extends HTMLElement {
                 timeGridDay: {buttonText: 'Day'},
                 timeGridWeek: {buttonText: 'Week'},
             },
+            slotMinTime: `${slotMinTime}:00:00`,
+            slotMaxTime: `${slotMaxTime}:00:00`,
             eventDrop: async (info) => {
                 await this.changeDate(info);
             },

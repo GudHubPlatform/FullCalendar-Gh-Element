@@ -15,6 +15,11 @@ export default class FullcalendarData {
                 data_type: 'calendar',
                 data_model: {
                     use_duration: false,
+                    use_custom_range: false,
+                    ranges: {
+                        min: '',
+                        max: ''
+                    },
                     view_id: "",
                     table_settings: {
                         action: ""
@@ -263,7 +268,42 @@ export default class FullcalendarData {
                                     data_type: 'field'
                                 };
                             }
+                        },{
+                            type: 'ghElement',
+                            property: 'data_model.use_custom_range',
+                            data_model: function () {
+                                return {
+                                    field_name: 'Custom Range',
+                                    name_space: 'custom_range',
+                                    data_type: 'boolean'
+                                };
+                            }
                         },
+                        {
+                            type: "ghElement",
+                            showIf: 'data_model.use_custom_range',
+                            property: "data_model.ranges.min",
+                            data_model: function () {
+                              return {
+                                field_name: "Min Time (0-24)",
+                                name_space: "min",
+                                data_type: "number",
+                              };
+                            },
+                        },
+                        {
+                            type: "ghElement",
+                            showIf: 'data_model.use_custom_range',
+                            property: "data_model.ranges.max",
+                            data_model: function () {
+                              return {
+                                field_name: "Max Time (0-24)",
+                                name_space: "max",
+                                data_type: "number",
+                              };
+                            },
+                        },
+                        
                         {
                             title: 'View template',
                             type: 'header'
