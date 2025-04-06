@@ -303,6 +303,41 @@ export default class FullcalendarData {
                               };
                             },
                         },
+                        {
+                            title: 'Time Format',
+                            showIf: 'data_model.use_custom_range',
+                            type: 'header'
+                        },
+                        {
+                            type: 'ghElement',
+                            showIf: 'data_model.use_custom_range',
+                            property: 'data_model.hour_format',
+                            data_model: function () {
+                                return {
+                                    data_model: {
+                                        interpretation: [{
+                                            src: 'form',
+                                            settings: {
+                                                show_field_name: 0
+                                            }
+                                        }],
+                                        options: [{
+                                            name: 'PM/AM',
+                                            icon: '12_AM',
+                                            color: '#d1d8dd',
+                                            value: 'en-US'
+                                        }, {
+                                            name: '24 hours',
+                                            icon: '24_00',
+                                            color: '#d1d8dd',
+                                            value: 'en-GB'
+                                        }],
+                                        show_field_name: false
+                                    },
+                                    data_type: 'radio_icon'
+                                };
+                            }
+                        },
                         
                         {
                             title: 'View template',

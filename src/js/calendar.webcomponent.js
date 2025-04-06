@@ -117,6 +117,8 @@ class Fullcalendar extends HTMLElement {
             slotMaxTime = this.fieldModel.data_model.ranges.max;
         }
 
+        const hourFormat = this.fieldModel.data_model?.hour_format;
+
         this.calendar = new Calendar(calendarElement, {
             plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
             initialView,
@@ -124,6 +126,7 @@ class Fullcalendar extends HTMLElement {
             eventResizableFromStart: true,
             eventDisplay: 'block',
             events: [],
+            locale: hourFormat ? hourFormat : 'en-US',
             showNonCurrentDates: false,
             headerToolbar: {
                 left: 'prev,next today',
