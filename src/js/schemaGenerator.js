@@ -62,8 +62,8 @@ export function schemaGenerator(options) {
     const startMonth = Number(options.month) < 10 ? `0${options.month}` : `${options.month}`;
     const endMonth = Number(options.month) < 9 ? `0${options.month + 1}` : Number(options.month) !== 12 ? `${options.month + 1}` : '01';
 
-    const startFilterDate = new Date(`${options.year}-${startMonth}-01`).getTime();
-    const endFilterDate = new Date(`${Number(options.month) != 12 ? options.year : options.year + 1}-${endMonth}-01`).getTime() - 1;
+    const startFilterDate = new Date(`${options.year}-${startMonth}-01`).getTime() - 86400000 * 8;
+    const endFilterDate = new Date(`${Number(options.month) != 12 ? options.year : options.year + 1}-${endMonth}-01`).getTime() + 86400000 * 8;
 
     return {
         type: "array",
