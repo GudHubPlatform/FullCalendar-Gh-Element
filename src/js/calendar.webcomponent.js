@@ -167,33 +167,52 @@ class Fullcalendar extends HTMLElement {
                     scope.$apply();
                 }
             },
-            datesSet: async (dateInfo) => {
-                let eventSource = this.calendar.getEventSourceById(`${dateInfo.start.getMonth() + 1}-${dateInfo.start.getUTCFullYear()}`);
-                let dateChanged = false;
-                let lastDate;
-                
-                if(eventSource) {
-                    lastDate = eventSource;
-                    eventSource = this.calendar.getEventSourceById(`${eventSource.context.currentDate.getMonth() + 1}-${eventSource.context.currentDate.getUTCFullYear()}`);
-                    dateChanged = true;
-                }
-
-                if(!eventSource) {
-                    let data;
-                    
-                    data = await this.getData(dateInfo.start.getMonth() + 1, dateInfo.start.getFullYear());
-
-                    if(dateChanged) {
-                        data = await this.getData(lastDate.context.currentDate.getMonth() + 1, lastDate.context.currentDate.getFullYear());
+            async datesSet(dateInfo) {
+                // Initialize array to collect months that need to be loaded
+                const monthsToLoad = [];
+            
+                // Create a clone of the start date to iterate over months
+                const current = new Date(dateInfo.start);
+            
+                // Loop through each month from start to end date (inclusive)
+                while (current <= dateInfo.end) {
+                    const month = current.getMonth();
+                    const year = current.getFullYear();
+                    const id = `${month}-${year}`; // Unique ID for the event source
+            
+                    // Check if data for this month is already loaded
+                    if (!this.calendar.getEventSourceById(id)) {
+                        // If not loaded, mark this month for data fetching
+                        monthsToLoad.push({ month, year, id });
                     }
-                    
-                    if(!this.sizeUpdated) {
-                        this.calendar.updateSize();
-                        this.sizeUpdated = true;
-                    }
-                    this.calendar.addEventSource(data);
-                    this.querySelector('.calendar__preloader').classList.remove('active');
+            
+                    // Move to the first day of the next month
+                    current.setMonth(current.getMonth() + 1);
+                    current.setDate(1);
                 }
+            
+                // If there are months to load, fetch and add them to the calendar
+                if (monthsToLoad.length) {
+                    for (const { month, year, id } of monthsToLoad) {
+                        // Fetch data for the given month and year
+                        const events = await this.getData(month, year);
+            
+                        // Add the fetched data as a new event source to the calendar
+                        this.calendar.addEventSource({
+                            id,
+                            events,
+                        });
+                    }
+                }
+            
+                // Ensure the calendar is resized only once
+                if (!this.sizeUpdated) {
+                    this.calendar.updateSize();
+                    this.sizeUpdated = true;
+                }
+            
+                // Hide the preloader spinner (if it exists)
+                this.querySelector('.calendar__preloader')?.classList.remove('active');
             }
         });
 
