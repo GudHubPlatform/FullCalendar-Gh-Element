@@ -167,53 +167,52 @@ class Fullcalendar extends HTMLElement {
                     scope.$apply();
                 }
             },
-            async datesSet(dateInfo) {
-                // Initialize array to collect months that need to be loaded
+            datesSet: async (dateInfo) => {
+                // Convert the provided start and end dates to Date objects
+                const startDate = new Date(dateInfo.start);
+                const endDate = new Date(dateInfo.end);
+            
+                 // Prepare an array to track which months need to be loaded
                 const monthsToLoad = [];
+                 // Start iterating from the beginning of the start month
+                const currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
             
-                // Create a clone of the start date to iterate over months
-                const current = new Date(dateInfo.start);
+                 // Loop through each month until the end date
+                while (currentDate <= endDate) {
+                    const month = currentDate.getMonth() + 1;
+                    const year = currentDate.getFullYear();
+                    const eventSourceId = `${month}-${year}`;
+
+                     // Check if the event source for this month already exists
+                    const eventSource = this.calendar.getEventSourceById(eventSourceId);
             
-                // Loop through each month from start to end date (inclusive)
-                while (current <= dateInfo.end) {
-                    const month = current.getMonth();
-                    const year = current.getFullYear();
-                    const id = `${month}-${year}`; // Unique ID for the event source
-            
-                    // Check if data for this month is already loaded
-                    if (!this.calendar.getEventSourceById(id)) {
-                        // If not loaded, mark this month for data fetching
-                        monthsToLoad.push({ month, year, id });
+                    // If not loaded yet, mark this month for data loading
+                    if (!eventSource) {
+                        monthsToLoad.push({ month, year, id: eventSourceId });
                     }
             
-                    // Move to the first day of the next month
-                    current.setMonth(current.getMonth() + 1);
-                    current.setDate(1);
+                    // Move to the next month
+                    currentDate.setMonth(currentDate.getMonth() + 1);
                 }
             
-                // If there are months to load, fetch and add them to the calendar
+                // If there are months that need to be loaded, fetch and add their events
                 if (monthsToLoad.length) {
                     for (const { month, year, id } of monthsToLoad) {
-                        // Fetch data for the given month and year
-                        const events = await this.getData(month, year);
-            
-                        // Add the fetched data as a new event source to the calendar
-                        this.calendar.addEventSource({
-                            id,
-                            events,
-                        });
+                        const data = await this.getData(month, year);
+                        data.id = id;
+                        this.calendar.addEventSource(data);
                     }
                 }
             
-                // Ensure the calendar is resized only once
+                // Ensure the calendar size is updated only once
                 if (!this.sizeUpdated) {
                     this.calendar.updateSize();
                     this.sizeUpdated = true;
                 }
             
-                // Hide the preloader spinner (if it exists)
+                // Hide the preloader once data loading is complete
                 this.querySelector('.calendar__preloader')?.classList.remove('active');
-            }
+            }   
         });
 
         setTimeout(() => {
