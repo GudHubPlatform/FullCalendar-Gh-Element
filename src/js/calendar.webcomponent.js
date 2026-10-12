@@ -293,12 +293,20 @@ class Fullcalendar extends HTMLElement {
     // Fetching data for calendar, preparing it, and passing to calendar
 
     async getCalendarEvents() {
-        const pickedDate = this.calendar.getDate();
-        let updatedData = await this.getData(pickedDate.getMonth() + 1, pickedDate.getUTCFullYear());
+        // Reload every month that falls into the visible range (a week can span two months)
+        const { activeStart, activeEnd } = this.calendar.view;
+        const currentDate = new Date(activeStart.getFullYear(), activeStart.getMonth(), 1);
+
+        const updatedData = [];
+        while (currentDate < activeEnd) {
+            updatedData.push(await this.getData(currentDate.getMonth() + 1, currentDate.getFullYear()));
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+
         this.calendar.getEventSources().forEach(source => {
             source.remove();
         });
-        this.calendar.addEventSource(updatedData);
+        updatedData.forEach(data => this.calendar.addEventSource(data));
     }
 
     /* UNSUBSCRIBE FROM PIPE SERVICE */
