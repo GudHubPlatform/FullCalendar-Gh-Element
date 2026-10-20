@@ -23,7 +23,8 @@ class Fullcalendar extends HTMLElement {
         this.isDurationMode;
         this.calendarType;
         this.filtersFromEvent = [];
-        this.sizeUpdated = false;
+        this.resizeObserver;
+        this.calendarWidth = 0;
     }
 
     /********************* OBSERVED ATTRIBUTES *********************/
@@ -204,12 +205,6 @@ class Fullcalendar extends HTMLElement {
                     }
                 }
             
-                // Ensure the calendar size is updated only once
-                if (!this.sizeUpdated) {
-                    this.calendar.updateSize();
-                    this.sizeUpdated = true;
-                }
-            
                 // Hide the preloader once data loading is complete
                 this.querySelector('.calendar__preloader')?.classList.remove('active');
             }   
@@ -217,9 +212,26 @@ class Fullcalendar extends HTMLElement {
 
         setTimeout(() => {
             this.calendar.render();
+            this.observeCalendarResize(calendarElement);
             this.subscribeToPipeService();
         }, 0);
 
+    }
+
+    /********************* OBSERVE CALENDAR RESIZE *********************/
+    // Fullcalendar measures its width only on render and on window resize.
+    // If calendar was rendered while container was narrow (view opening, iframe, etc.), it stays narrow.
+    // So we update calendar size every time container width changes.
+
+    observeCalendarResize(calendarElement) {
+        this.resizeObserver = new ResizeObserver(([entry]) => {
+            const width = Math.round(entry.contentRect.width);
+            if (width && width !== this.calendarWidth) {
+                this.calendarWidth = width;
+                this.calendar.updateSize();
+            }
+        });
+        this.resizeObserver.observe(calendarElement);
     }
 
     /********************* CHANGE DATE *********************/
@@ -348,6 +360,7 @@ class Fullcalendar extends HTMLElement {
 
     disconnectedCallback() {
         this.unsubscribeFromPipe();
+        this.resizeObserver?.disconnect();
         this.calendar.destroy();
     }
 }
