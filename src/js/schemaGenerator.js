@@ -103,7 +103,7 @@ export function schemaGenerator(options) {
             {
                 type: "property",
                 id: 8,
-                property_name: "textColor",
+                property_name: "contrastColor",
                 property_type: "function",
                 args: [options.stylesAppId, options.stylesFieldId],
                 function: styleTextFunction
@@ -111,7 +111,7 @@ export function schemaGenerator(options) {
             {
                 type: "property",
                 id: 10,
-                property_name: "backgroundColor",
+                property_name: "color",
                 property_type: "function",
                 args: [options.stylesAppId, options.stylesFieldId],
                 function: styleBackgroundFunction
