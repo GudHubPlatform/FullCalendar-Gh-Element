@@ -1,13 +1,20 @@
+@use 'sass:color';
+// Same as $blue in GudHub-Client css/constants.scss
+$blue: #0D99FF;
+
 full-calendar {
     width: 100%;
+
+    // GudHub blue instead of Forma's default blue palette
+    --fc-forma-primary: #{$blue};
+    --fc-forma-primary-over: #{color.adjust($blue, $lightness: -6%)};
+    --fc-forma-primary-down: #{color.adjust($blue, $lightness: -12%)};
+    --fc-forma-event: #{$blue};
+    --fc-forma-highlight: #{rgba($blue, 0.35)};
 }
 
 .fullcalendar {
     width: 100%;
-}
-
-a.fc-daygrid-dot-event:hover {
-    padding: 2px;
 }
 
 .calendar {

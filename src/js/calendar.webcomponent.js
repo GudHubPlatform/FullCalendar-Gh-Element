@@ -1,14 +1,22 @@
-import { Calendar } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import listPlugin from '@fullcalendar/list';
+import { Calendar } from 'fullcalendar';
+import dayGridPlugin from 'fullcalendar/daygrid';
+import timeGridPlugin from 'fullcalendar/timegrid';
+import interactionPlugin from 'fullcalendar/interaction';
+import listPlugin from 'fullcalendar/list';
+import formaThemePlugin from 'fullcalendar/themes/forma';
 
 import { schemaGenerator } from './schemaGenerator.js';
 
+import 'fullcalendar/skeleton.css';
+import 'fullcalendar/themes/forma/theme.css';
+import 'fullcalendar/themes/forma/palettes/blue.css';
+
 import './../scss/style.scss';
 
-import '@fullcalendar/common/main.min.css';
+// Calendar doesn't get shorter than this, even if there is less space left in the scroll container.
+const CALENDAR_MIN_HEIGHT = 350;
+// Space left between calendar and bottom edge of the scroll container.
+const CALENDAR_BOTTOM_GAP = 16;
 
 /********************* FULLCALENDAR WEB COMPONENT CREATING *********************/
 
@@ -24,7 +32,8 @@ class Fullcalendar extends HTMLElement {
         this.calendarType;
         this.filtersFromEvent = [];
         this.resizeObserver;
-        this.calendarWidth = 0;
+        this.scrollContainer;
+        this.calendarHeight;
     }
 
     /********************* OBSERVED ATTRIBUTES *********************/
@@ -121,30 +130,30 @@ class Fullcalendar extends HTMLElement {
         const hourFormat = this.fieldModel.data_model?.hour_format;
 
         this.calendar = new Calendar(calendarElement, {
-            plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
+            plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, formaThemePlugin],
             initialView,
             editable: true,
             eventResizableFromStart: true,
-            eventDisplay: 'block',
             events: [],
             locale: hourFormat ? hourFormat : 'en-US',
             showNonCurrentDates: false,
+            expandRows: true,
+            weekNumbers: true,
             headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
+                left: 'today prev,next title',
                 right: calendarViewOptions
             },
             dayMaxEvents: true,
-            views: {
-                listDay: { buttonText: 'List day' },
-                listWeek: { buttonText: 'List week' },
-                listMonth: { buttonText: 'Month' },
-                listYear: { buttonText: 'Year' },
-                dayGridDay: {buttonText: 'Day'},
-                dayGridWeek: {buttonText: 'Week'},
-                dayGridMonth: {buttonText: 'Month'},
-                timeGridDay: {buttonText: 'Day'},
-                timeGridWeek: {buttonText: 'Week'},
+            buttons: {
+                listDay: { text: 'List day' },
+                listWeek: { text: 'List week' },
+                listMonth: { text: 'Month' },
+                listYear: { text: 'Year' },
+                dayGridDay: { text: 'Day' },
+                dayGridWeek: { text: 'Week' },
+                dayGridMonth: { text: 'Month' },
+                timeGridDay: { text: 'Day' },
+                timeGridWeek: { text: 'Week' },
             },
             slotMinTime: `${slotMinTime}:00:00`,
             slotMaxTime: `${slotMaxTime}:00:00`,
@@ -212,26 +221,51 @@ class Fullcalendar extends HTMLElement {
 
         setTimeout(() => {
             this.calendar.render();
-            this.observeCalendarResize(calendarElement);
+            this.observeAvailableHeight();
             this.subscribeToPipeService();
         }, 0);
 
     }
 
-    /********************* OBSERVE CALENDAR RESIZE *********************/
-    // Fullcalendar measures its width only on render and on window resize.
-    // If calendar was rendered while container was narrow (view opening, iframe, etc.), it stays narrow.
-    // So we update calendar size every time container width changes.
+    /********************* OBSERVE AVAILABLE HEIGHT *********************/
+    // By default fullcalendar keeps aspect ratio, so on narrow screens it leaves empty space below,
+    // and on wide screens it gets taller than the view, so the view scrolls and toolbar goes out of sight.
+    // We fit calendar exactly to the bottom of the nearest scroll container (gh-window body or viewport),
+    // so there is only one scroll - inside the calendar, and toolbar is always visible.
 
-    observeCalendarResize(calendarElement) {
-        this.resizeObserver = new ResizeObserver(([entry]) => {
-            const width = Math.round(entry.contentRect.width);
-            if (width && width !== this.calendarWidth) {
-                this.calendarWidth = width;
-                this.calendar.updateSize();
+    observeAvailableHeight() {
+        this.scrollContainer = this.getScrollContainer();
+        this.resizeObserver = new ResizeObserver(() => this.fitCalendarHeight());
+        this.resizeObserver.observe(this.scrollContainer || document.documentElement);
+        this.resizeObserver.observe(this.querySelector('.calendar__wrapper'));
+        this.fitCalendarHeight();
+    }
+
+    getScrollContainer() {
+        let element = this.parentElement;
+        while (element && element !== document.body) {
+            if (/(auto|scroll)/.test(getComputedStyle(element).overflowY)) {
+                return element;
             }
-        });
-        this.resizeObserver.observe(calendarElement);
+            element = element.parentElement;
+        }
+        return null;
+    }
+
+    fitCalendarHeight() {
+        const containerTop = this.scrollContainer ? this.scrollContainer.getBoundingClientRect().top : 0;
+        const containerScrollTop = this.scrollContainer ? this.scrollContainer.scrollTop : window.scrollY;
+        const containerHeight = this.scrollContainer ? this.scrollContainer.clientHeight : window.innerHeight;
+
+        // Calendar position inside scroll container content, independent of current scroll
+        const calendarTop = this.getBoundingClientRect().top - containerTop + containerScrollTop;
+        const availableHeight = containerHeight - calendarTop - CALENDAR_BOTTOM_GAP;
+
+        const height = Math.round(Math.max(availableHeight, CALENDAR_MIN_HEIGHT));
+        if (height && height !== this.calendarHeight) {
+            this.calendarHeight = height;
+            this.calendar.setOption('height', height);
+        }
     }
 
     /********************* CHANGE DATE *********************/
